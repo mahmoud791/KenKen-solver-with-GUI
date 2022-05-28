@@ -13,3 +13,20 @@ class CSP():
         self.initial = ()
         self.curr_domains = None
         self.nassigns = 0
+        
+    def assign(self, var, val, assignment):
+        
+        assignment[var] = val
+        self.nassigns += 1
+
+    def unassign(self, var, assignment):
+        
+        if var in assignment:
+            del assignment[var]
+
+    def nconflicts(self, var, val, assignment):
+       
+        def conflict(var2):
+            return (var2 in assignment and
+                    not self.constraints(var, val, var2, assignment[var2]))
+        return count(conflict(v) for v in self.neighbors[var])
