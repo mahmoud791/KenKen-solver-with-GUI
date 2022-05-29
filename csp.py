@@ -13,7 +13,7 @@ class CSP():
         self.initial = ()
         self.curr_domains = None
         self.nassigns = 0
-        
+
     def assign(self, var, val, assignment):
         
         assignment[var] = val
@@ -30,3 +30,60 @@ class CSP():
             return (var2 in assignment and
                     not self.constraints(var, val, var2, assignment[var2]))
         return count(conflict(v) for v in self.neighbors[var])
+
+    
+
+    def actions(self, state):
+        if len(state) == len(self.variables):
+            return []
+        else:
+            assignment = dict(state)
+            var = first([v for v in self.variables if v not in assignment])
+            return [(var, val) for val in self.domains[var]
+                    if self.nconflicts(var, val, assignment) == 0]
+
+    def result(self, state, action):
+        (var, val) = action
+        return state + ((var, val),)
+
+    def goal_test(self, state):
+        assignment = dict(state)
+        return (len(assignment) == len(self.variables)
+                and all(self.nconflicts(variables, assignment[variables], assignment) == 0
+                        for variables in self.variables))
+
+
+    def support_pruning(self):
+        #Make sure we can prune values from domains
+        if self.curr_domains is None:
+            self.curr_domains = {v: list(self.domains[v]) for v in self.variables}
+
+    def suppose(self, var, value):
+        
+        self.support_pruning()
+        removals = [(var, a) for a in self.curr_domains[var] if a != value]
+        self.curr_domains[var] = [value]
+        return removals
+
+    def prune(self, var, value, removals):
+        """Rule out var=value."""
+        self.curr_domains[var].remove(value)
+        if removals is not None:
+            removals.append((var, value))
+
+    def choices(self, var):
+        return (self.curr_domains or self.domains)[var]
+
+    def infer_assignment(self):
+        self.support_pruning()
+        return {v: self.curr_domains[v][0]
+                for v in self.variables if 1 == len(self.curr_domains[v])}
+
+    def restore(self, removals):
+        for B, b in removals:
+            self.curr_domains[B].append(b)
+
+
+    def conflicted_vars(self, current):
+        return [var for var in self.variables
+                if self.nconflicts(var, current[var], current) > 0]
