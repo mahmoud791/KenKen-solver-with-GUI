@@ -33,7 +33,6 @@ def adjacent(xy1, xy2):
 
     return (dx == 0 and abs(dy) == 1) or (dy == 0 and abs(dx) == 1)
 
-
 def generate(size):
     
     #Generate a random kenken puzzle of the given size
@@ -100,7 +99,6 @@ def generate(size):
 
     return size, cliques
 
-  
 def conflicting(A, a, B, b):
     
     for i in range(len(A)):
@@ -114,8 +112,6 @@ def conflicting(A, a, B, b):
                 return True
 
     return False
-
-
 
 def satisfies(values, operation, target):
     
