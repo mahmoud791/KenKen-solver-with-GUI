@@ -16,6 +16,24 @@ from solver import *
 
 
 
+def random_color():
+    R = randint(0,255)
+    G = randint(0,255)
+    B = randint(0,255)
+    return R,G,B
+
+def euclidistance(x1,y1,x2,y2):
+    return sqrt((x1-x2)**2 + (y1-y2)**2)
+
+def top_left(cage):
+    min_distance = 10000
+    TopLeft = None
+    for pos in cage:
+        dist = euclidistance(pos[1],pos[0],1,1)
+        if dist < min_distance:
+            min_distance = dist
+            TopLeft = pos
+    return TopLeft
 
 
 
@@ -79,3 +97,73 @@ class App(QWidget):
         self.layout.addWidget(self.solve_button)
         self.solve_button.setToolTip('press this to generate randon KeneKen board with the specified size')
         self.solve_button.clicked.connect(self.Solve)
+
+        
+        
+        
+ 
+
+       
+
+        
+
+    @pyqtSlot()
+    def Generate(self):
+        self.size = int(self.size_entry.text())
+        _,self.cliques = generate(size=self.size)
+        self.tableWidget.setRowCount(self.size)
+        self.tableWidget.setColumnCount(self.size)
+        for c in self.cliques:
+            color = random_color()
+            cage = c[0]
+            
+            TopLeft = top_left(cage=cage)
+            
+            for idx in cage:
+                self.tableWidget.setItem(idx[1]-1,idx[0]-1,QTableWidgetItem())
+                self.tableWidget.item(idx[1]-1,idx[0]-1).setBackground(QtGui.QColor(color[0],color[1],color[2]))
+        
+            self.tableWidget.item(TopLeft[1]-1,TopLeft[0]-1).setText(c[1]+'('+str(c[2])+')')
+
+    
+    @pyqtSlot()
+    def Solve(self):
+        ken = Kenken(self.size,self.cliques)
+        algorithm = self.algo_entry.currentText()
+        if algorithm == "Backtracking":
+            assignment = backtracking_search(ken)
+        elif algorithm == "Backtracking with Forward Checking":
+            assignment = backtracking_search(ken,inference=forward_checking)
+        elif algorithm == "Backtracking with Arc consistency":
+            assignment = backtracking_search(ken,inference=mac)
+            
+
+
+        
+        for cage in assignment:
+            for i in range(len(cage)):
+                value = assignment[cage][i]
+                idx = cage[i]
+                temp = self.tableWidget.item(idx[1]-1,idx[0]-1).text()
+                self.tableWidget.item(idx[1]-1,idx[0]-1).setText(temp + ' ' + str(value))
+
+                
+            
+
+            
+
+        
+        
+        
+       
+ 
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
+
+
+
+
+
+
