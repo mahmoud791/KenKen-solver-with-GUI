@@ -14,6 +14,9 @@ the program offers 3 different algorrithms to solve the game
 2- backtracking with forward checking
 3- backtracking with forward checking and arc consistency 
 
+![image](https://user-images.githubusercontent.com/64699750/171909027-371f981c-499f-4a50-84f4-b1244fa6f883.png)
+
+
 
 to run this project :
 1-enter the project directory
