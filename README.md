@@ -1,6 +1,6 @@
 # KenKen-solver-with-GUI
 
-This project implements KenKen Game with Pyhton and PyQt5
+This project implements KenKen Game with Python and PyQt5
 
 the user determines the board size then the program generates a random board with the determined size 
 
